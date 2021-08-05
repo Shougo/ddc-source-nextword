@@ -6,6 +6,7 @@ import {
   Denops,
   SourceOptions,
 } from "https://deno.land/x/ddc_vim@v0.0.9/types.ts";
+import { Denops, } from "https://deno.land/x/ddc_vim@v0.0.9/deps.ts";
 import {
   readLines, writeAll
 } from "https://deno.land/std@0.103.0/io/mod.ts";
