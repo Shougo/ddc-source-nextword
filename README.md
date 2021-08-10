@@ -17,6 +17,12 @@ A ddc.vim source for `nextword` for completing words in English.
 ```vim
 " Use nextword source.
 call ddc#custom#patch_global('sources', ['nextword'])
+call ddc#custom#patch_global('sourceOptions', {
+    \ 'nextword': {
+    \   'mark': 'nextword',
+    \   'minAutoCompleteLength': 3,
+    \   'isVolatile': v:true,
+    \ }})
 ```
 
 
