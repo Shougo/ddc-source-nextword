@@ -3,7 +3,6 @@ import {
   Candidate,
   Context,
   DdcOptions,
-  Denops,
   SourceOptions,
 } from "https://deno.land/x/ddc_vim@v0.0.13/types.ts#^";
 import { Denops, } from "https://deno.land/x/ddc_vim@v0.0.13/deps.ts#^";
@@ -14,23 +13,28 @@ import {
 export class Source extends BaseSource {
   _proc: Deno.Process;
 
+  constructor() {
+    super();
+
+    this._proc = Deno.run({
+      cmd: ["nextword", "-n", "100", "-g"],
+      stdout: "piped",
+      stderr: "piped",
+      stdin: "piped",
+    });
+  }
+
   async gatherCandidates(
-    denops: Denops,
+    _denops: Denops,
     context: Context,
-    _options: SourceOptions,
+    _options: DdcOptions,
     _sourceOptions: SourceOptions,
     _sourceParams: Record<string, unknown>,
     _completeStr: string,
   ): Promise<Candidate[]> {
-    if (!this._proc) {
-      this._proc = Deno.run({
-        cmd: ["nextword", "-n", "100", "-g"],
-        stdout: "piped",
-        stderr: "piped",
-        stdin: "piped",
-      });
+    if (!this._proc.stdin || !this._proc.stdout) {
+      return [];
     }
-
     await writeAll(this._proc.stdin, new TextEncoder().encode(context.input + "\n"));
 
     // Todo: Better implementation
