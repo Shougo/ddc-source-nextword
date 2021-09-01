@@ -8,23 +8,28 @@ import {
 } from "https://deno.land/std@0.104.0/io/mod.ts#^";
 
 export class Source extends BaseSource {
-  _proc: Deno.Process;
+  _proc: Deno.Process | undefined = undefined;
 
   constructor() {
     super();
 
-    this._proc = Deno.run({
-      cmd: ["nextword", "-n", "100", "-g"],
-      stdout: "piped",
-      stderr: "piped",
-      stdin: "piped",
-    });
+    try {
+      this._proc = Deno.run({
+        cmd: ["nextword", "-n", "100", "-g"],
+        stdout: "piped",
+        stderr: "piped",
+        stdin: "piped",
+      });
+    } catch (e) {
+      console.error("[ddc-nextword] Run \"nextword\" is failed");
+      console.error("[ddc-nextword] \"nextword\" binary seems not installed");
+    }
   }
 
   async gatherCandidates(args: {
     context: Context,
   }): Promise<Candidate[]> {
-    if (!this._proc.stdin || !this._proc.stdout) {
+    if (!this._proc || !this._proc.stdin || !this._proc.stdout) {
       return [];
     }
     await writeAll(this._proc.stdin,
