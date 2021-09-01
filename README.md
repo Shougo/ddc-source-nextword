@@ -2,6 +2,8 @@
 
 A ddc.vim source for `nextword` for completing words in English.
 
+**Note: "nextword" binary must be installed in your `$PATH`!!**
+
 
 ## Dependencies
 
@@ -10,6 +12,8 @@ A ddc.vim source for `nextword` for completing words in English.
 * https://github.com/high-moctane/nextword-data
 
 * Set `$NEXTWORD_DATA_PATH` environment variable
+
+Please test `nextword -n 100 -g` works from command line.
 
 
 ## Configuration
