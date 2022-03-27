@@ -3,9 +3,8 @@ import {
   Context,
   Item,
 } from "https://deno.land/x/ddc_vim@v2.2.0/types.ts";
-import {
-  readLines, writeAll
-} from "https://deno.land/std@0.132.0/io/mod.ts";
+import { readLines } from "https://deno.land/std@0.132.0/io/mod.ts";
+import { writeAll } from "https://deno.land/std@0.132.0/streams/mod.ts";
 
 type Params = Record<never, never>;
 

@@ -15,11 +15,14 @@ INTRODUCTION					*ddc-nextword-introduction*
 
 A ddc.vim source for `nextword` for completing words in English.
 
-Note: "nextword" binary must be installed in your `$PATH`!!
+Note: "nextword" is deprecated.  You should use ddc-mocword instead.
+https://github.com/Shougo/ddc-mocword
 
 
 ==============================================================================
 INSTALL							*ddc-nextword-install*
+
+Note: "nextword" binary must be installed in your `$PATH`!!
 
 Please install both "ddc.vim" and "denops.vim".
 
