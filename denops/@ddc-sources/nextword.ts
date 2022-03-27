@@ -1,13 +1,15 @@
 import {
   BaseSource,
-  Candidate,
   Context,
-} from "https://deno.land/x/ddc_vim@v0.17.0/types.ts#^";
+  Item,
+} from "https://deno.land/x/ddc_vim@v2.2.0/types.ts";
 import {
   readLines, writeAll
-} from "https://deno.land/std@0.113.0/io/mod.ts#^";
+} from "https://deno.land/std@0.132.0/io/mod.ts";
 
-export class Source extends BaseSource<{}> {
+type Params = Record<never, never>;
+
+export class Source extends BaseSource<Params> {
   _proc: Deno.Process | undefined = undefined;
 
   constructor() {
@@ -26,9 +28,9 @@ export class Source extends BaseSource<{}> {
     }
   }
 
-  async gatherCandidates(args: {
+  async gather(args: {
     context: Context,
-  }): Promise<Candidate[]> {
+  }): Promise<Item[]> {
     if (!this._proc || !this._proc.stdin || !this._proc.stdout) {
       return [];
     }
@@ -43,5 +45,5 @@ export class Source extends BaseSource<{}> {
     return [];
   }
 
-  params(): {} { return {}; }
+  params(): Params { return {}; }
 }

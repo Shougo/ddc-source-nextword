@@ -19,7 +19,6 @@ Please test `nextword -n 100 -g` works from command line.
 ## Configuration
 
 ```vim
-" Use nextword source.
 call ddc#custom#patch_global('sources', ['nextword'])
 call ddc#custom#patch_global('sourceOptions', {
     \ 'nextword': {
