@@ -3,8 +3,8 @@ import {
   Context,
   Item,
 } from "https://deno.land/x/ddc_vim@v2.2.0/types.ts";
-import { readLines } from "https://deno.land/std@0.132.0/io/mod.ts";
-import { writeAll } from "https://deno.land/std@0.132.0/streams/mod.ts";
+import { readLines } from "https://deno.land/std@0.136.0/io/mod.ts";
+import { writeAll } from "https://deno.land/std@0.136.0/streams/mod.ts";
 
 type Params = Record<never, never>;
 
@@ -22,19 +22,21 @@ export class Source extends BaseSource<Params> {
         stdin: "piped",
       });
     } catch (e) {
-      console.error("[ddc-nextword] Run \"nextword\" is failed");
-      console.error("[ddc-nextword] \"nextword\" binary seems not installed");
+      console.error('[ddc-nextword] Run "nextword" is failed');
+      console.error('[ddc-nextword] "nextword" binary seems not installed');
     }
   }
 
   async gather(args: {
-    context: Context,
+    context: Context;
   }): Promise<Item[]> {
     if (!this._proc || !this._proc.stdin || !this._proc.stdout) {
       return [];
     }
-    await writeAll(this._proc.stdin,
-                   new TextEncoder().encode(args.context.input + "\n"));
+    await writeAll(
+      this._proc.stdin,
+      new TextEncoder().encode(args.context.input + "\n"),
+    );
 
     // Todo: Better implementation
     for await (const line of readLines(this._proc.stdout)) {
@@ -44,5 +46,7 @@ export class Source extends BaseSource<Params> {
     return [];
   }
 
-  params(): Params { return {}; }
+  params(): Params {
+    return {};
+  }
 }
