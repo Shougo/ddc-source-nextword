@@ -1,17 +1,17 @@
-*ddc-nextword.txt*	nextword completion for ddc.vim
+*ddc-source-nextword.txt*	nextword completion for ddc.vim
 
 Author: Shougo <Shougo.Matsu at gmail.com>
 License: MIT license
 
-CONTENTS					*ddc-nextword-contents*
+CONTENTS					*ddc-source-nextword-contents*
 
-Introduction		|ddc-nextword-introduction|
-Install			|ddc-nextword-install|
-Examples		|ddc-nextword-examples|
+Introduction		|ddc-source-nextword-introduction|
+Install			|ddc-source-nextword-install|
+Examples		|ddc-source-nextword-examples|
 
 
 ==============================================================================
-INTRODUCTION					*ddc-nextword-introduction*
+INTRODUCTION				*ddc-source-nextword-introduction*
 
 A ddc.vim source for `nextword` for completing words in English.
 
@@ -20,7 +20,7 @@ https://github.com/Shougo/ddc-mocword
 
 
 ==============================================================================
-INSTALL							*ddc-nextword-install*
+INSTALL						*ddc-source-nextword-install*
 
 Note: "nextword" binary must be installed in your `$PATH`!!
 
@@ -40,7 +40,7 @@ Please test `nextword -n 100 -g` works from command line.
 
 
 ==============================================================================
-EXAMPLES					*ddc-nextword-examples*
+EXAMPLES				*ddc-source-nextword-examples*
 >
 	call ddc#custom#patch_global('sources', ['nextword'])
 	call ddc#custom#patch_global('sourceOptions', {

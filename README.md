@@ -1,4 +1,4 @@
-# ddc-nextword: nextword completion for ddc.vim
+# ddc-source-nextword: nextword completion for ddc.vim
 
 A ddc.vim source for `nextword` for completing words in English.
 
