@@ -2,9 +2,9 @@ import {
   BaseSource,
   Context,
   Item,
-} from "https://deno.land/x/ddc_vim@v3.0.0/types.ts";
-import { readLines } from "https://deno.land/std@0.161.0/io/mod.ts";
-import { writeAll } from "https://deno.land/std@0.161.0/streams/mod.ts";
+} from "https://deno.land/x/ddc_vim@v3.2.0/types.ts";
+import { readLines } from "https://deno.land/std@0.165.0/io/mod.ts";
+import { writeAll } from "https://deno.land/std@0.165.0/streams/mod.ts";
 
 type Params = Record<never, never>;
 

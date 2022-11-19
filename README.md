@@ -21,11 +21,11 @@ Please test `nextword -n 100 -g` works from command line.
 
 ```vim
 call ddc#custom#patch_global('sources', ['nextword'])
-call ddc#custom#patch_global('sourceOptions', {
-    \ 'nextword': {
-    \   'mark': 'nextword',
-    \   'minAutoCompleteLength': 3,
-    \   'isVolatile': v:true,
+call ddc#custom#patch_global('sourceOptions', #{
+    \   nextword: #{
+    \     mark: 'nextword',
+    \     minAutoCompleteLength: 3,
+    \     isVolatile: v:true,
     \ }})
 ```
 
