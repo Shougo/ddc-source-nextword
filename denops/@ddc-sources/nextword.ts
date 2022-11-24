@@ -21,13 +21,13 @@ export class Source extends BaseSource<Params> {
         stderr: "piped",
         stdin: "piped",
       });
-    } catch (e) {
+    } catch (_e) {
       console.error('[ddc-nextword] Run "nextword" is failed');
       console.error('[ddc-nextword] "nextword" binary seems not installed');
     }
   }
 
-  async gather(args: {
+  override async gather(args: {
     context: Context;
   }): Promise<Item[]> {
     if (!this._proc || !this._proc.stdin || !this._proc.stdout) {
@@ -46,7 +46,7 @@ export class Source extends BaseSource<Params> {
     return [];
   }
 
-  params(): Params {
+  override params(): Params {
     return {};
   }
 }
