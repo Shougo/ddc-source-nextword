@@ -26,13 +26,17 @@ export class Source extends BaseSource<Params> {
           stdin: "piped",
         },
       ).spawn();
-    } catch {
-      await args.denops.call(
-        "ddc#util#print_error",
-        'Spawning "mocword" is failed. "mocword" binary seems not installed',
-        "ddc-source-mocword",
-      );
-      return;
+    } catch (error: unknown) {
+      if (error instanceof Deno.errors.NotFound) {
+        await args.denops.call(
+          "ddc#util#print_error",
+          'Spawning "nextword" is failed. "nextword" binary seems not installed',
+          "ddc-source-nextword",
+        );
+        return;
+      }
+
+      throw error;
     }
     this.#proc.stdout
       .pipeThrough(new TextDecoderStream())
@@ -46,6 +50,15 @@ export class Source extends BaseSource<Params> {
         this.#readCallback = () => {};
         this.#writer = undefined;
       });
+    this.#proc.status.then(async (status) => {
+      if (!status.success) {
+        await args.denops.call(
+          "ddc#util#print_error",
+          '"nextword" exited with non-zero status code. $NEXTWORD_DATA_PATH seems not set correctly.',
+          "ddc-source-nextword",
+        );
+      }
+    });
     this.#writer = this.#proc.stdin.getWriter();
   }
 
