@@ -1,20 +1,23 @@
+import { BaseSource, Item } from "https://deno.land/x/ddc_vim@v4.3.1/types.ts";
 import {
-  BaseSource,
-  Context,
-  Item,
-} from "https://deno.land/x/ddc_vim@v4.0.4/types.ts";
-import { TextLineStream } from "https://deno.land/std@0.198.0/streams/mod.ts";
+  GatherArguments,
+  OnInitArguments,
+} from "https://deno.land/x/ddc_vim@v4.3.1/base/source.ts";
+import { assertEquals } from "https://deno.land/std@0.210.0/assert/mod.ts";
+import { TextLineStream } from "https://deno.land/std@0.210.0/streams/text_line_stream.ts";
 
 type Params = Record<string, never>;
 
+const encoder = new TextEncoder();
+
 export class Source extends BaseSource<Params> {
-  private _proc: Deno.ChildProcess | undefined = undefined;
+  private proc: Deno.ChildProcess | undefined;
+  private readCallback: (result: string) => void = () => {};
+  private writer: WritableStreamDefaultWriter<Uint8Array> | undefined;
 
-  constructor() {
-    super();
-
+  override async onInit(args: OnInitArguments<Params>): Promise<void> {
     try {
-      this._proc = new Deno.Command(
+      this.proc = new Deno.Command(
         "nextword",
         {
           args: ["-n", "100", "-g"],
@@ -23,17 +26,31 @@ export class Source extends BaseSource<Params> {
           stdin: "piped",
         },
       ).spawn();
-    } catch (_e) {
-      console.error('[ddc-nextword] Run "nextword" is failed');
-      console.error('[ddc-nextword] "nextword" binary seems not installed');
+    } catch {
+      await args.denops.call(
+        "ddc#util#print_error",
+        'Spawning "mocword" is failed. "mocword" binary seems not installed',
+        "ddc-source-mocword",
+      );
+      return;
     }
+    this.proc.stdout
+      .pipeThrough(new TextDecoderStream())
+      .pipeThrough(new TextLineStream())
+      .pipeTo(
+        new WritableStream({
+          write: (chunk: string) => this.readCallback(chunk),
+        }),
+      ).finally(() => {
+        this.proc = undefined;
+        this.readCallback = () => {};
+        this.writer = undefined;
+      });
+    this.writer = this.proc.stdin.getWriter();
   }
 
-  override async gather(args: {
-    context: Context;
-    completeStr: string;
-  }): Promise<Item[]> {
-    if (!this._proc || !this._proc.stdin || !this._proc.stdout) {
+  override async gather(args: GatherArguments<Params>): Promise<Item[]> {
+    if (!this.proc || !this.writer) {
       return [];
     }
 
@@ -41,41 +58,16 @@ export class Source extends BaseSource<Params> {
     const query = offset > 0 ? sentence : args.context.input;
     const precedingLetters = args.completeStr.slice(0, offset);
 
-    try {
-      const writer = this._proc.stdin.getWriter();
-      await writer.ready;
-      await writer.write(new TextEncoder().encode(query + "\n"));
-      writer.releaseLock();
+    const { promise, resolve } = Promise.withResolvers<string>();
+    this.readCallback = resolve;
 
-      for await (const line of iterLine(this._proc.stdout)) {
-        return line.split(/\s/).map((word: string) => ({
-          word: precedingLetters.concat(word),
-        }));
-      }
-    } catch (_e) {
-      // NOTE: ReadableStream may be locked
-    }
-
-    return [];
+    await this.writer.write(encoder.encode(query + "\n"));
+    return (await promise).split(/\s/)
+      .map((word: string) => ({ word: precedingLetters.concat(word) }));
   }
 
   override params(): Params {
     return {};
-  }
-}
-
-async function* iterLine(r: ReadableStream<Uint8Array>): AsyncIterable<string> {
-  const lines = r
-    .pipeThrough(new TextDecoderStream(), {
-      preventCancel: true,
-      preventClose: true,
-    })
-    .pipeThrough(new TextLineStream());
-
-  for await (const line of lines) {
-    if ((line as string).length) {
-      yield line as string;
-    }
   }
 }
 
@@ -104,3 +96,34 @@ function extractWords(
   const offset = completeStr.lastIndexOf(lastWord);
   return [sentence, offset];
 }
+
+Deno.test("extractWords", () => {
+  assertEquals(
+    extractWords("input"),
+    ["input", 0],
+  );
+  assertEquals(
+    extractWords("UPPER_CASE_INPUT"),
+    ["UPPER CASE INPUT", 11],
+  );
+  assertEquals(
+    extractWords("camelCaseInput"),
+    ["camel Case Input", 9],
+  );
+  assertEquals(
+    extractWords("_snake_case_input"),
+    ["snake case input", 12],
+  );
+  assertEquals(
+    extractWords("_unfinished_input_"),
+    ["unfinished input ", 18],
+  );
+  assertEquals(
+    extractWords("unfinishedI"),
+    ["unfinished I", 10],
+  );
+  assertEquals(
+    extractWords("_i"),
+    ["i", 1],
+  );
+});
