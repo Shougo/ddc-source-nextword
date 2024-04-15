@@ -1,10 +1,11 @@
-import { BaseSource, Item } from "https://deno.land/x/ddc_vim@v4.3.1/types.ts";
+import { BaseSource, Item } from "https://deno.land/x/ddc_vim@v5.0.0/types.ts";
 import {
   GatherArguments,
   OnInitArguments,
-} from "https://deno.land/x/ddc_vim@v4.3.1/base/source.ts";
-import { assertEquals } from "https://deno.land/std@0.210.0/assert/mod.ts";
-import { TextLineStream } from "https://deno.land/std@0.210.0/streams/text_line_stream.ts";
+} from "https://deno.land/x/ddc_vim@v5.0.0/base/source.ts";
+import { printError } from "https://deno.land/x/ddc_vim@v5.0.0/utils.ts";
+import { assertEquals } from "https://deno.land/std@0.222.1/assert/mod.ts";
+import { TextLineStream } from "https://deno.land/std@0.222.1/streams/text_line_stream.ts";
 
 type Params = Record<string, never>;
 
@@ -28,10 +29,9 @@ export class Source extends BaseSource<Params> {
       ).spawn();
     } catch (error: unknown) {
       if (error instanceof Deno.errors.NotFound) {
-        await args.denops.call(
-          "ddc#util#print_error",
+        await printError(
+          args.denops,
           'Spawning "nextword" is failed. "nextword" binary seems not installed',
-          "ddc-source-nextword",
         );
         return;
       }
@@ -52,10 +52,9 @@ export class Source extends BaseSource<Params> {
       });
     this.#proc.status.then(async (status) => {
       if (!status.success) {
-        await args.denops.call(
-          "ddc#util#print_error",
+        await printError(
+          args.denops,
           '"nextword" exited with non-zero status code. $NEXTWORD_DATA_PATH seems not set correctly.',
-          "ddc-source-nextword",
         );
       }
     });
